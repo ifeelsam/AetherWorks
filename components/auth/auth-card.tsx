@@ -87,7 +87,7 @@ export default function AuthCard({ onAuthSuccess }: AuthCardProps) {
 
         {/* Security Notice */}
         <div className="border-l-4 border-black bg-gray-50 p-4 space-y-1">
-          <p className="font-semibold text-sm">Secured by Blockchain</p>
+          <p className="font-semibold text-sm">Secured by AetherWorks</p>
           <p className="text-xs text-gray-600">Connect with Base Sepolia</p>
           <p className="text-xs text-gray-600">Your keys, your custody</p>
         </div>

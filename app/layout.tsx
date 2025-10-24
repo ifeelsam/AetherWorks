@@ -10,7 +10,7 @@ const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], weight: ["400", "500", 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "600"] })
 
 export const metadata: Metadata = {
-  title: "Web3 UGC Marketplace - Create. Connect. Get Paid Onchain.",
+  title: "AetherWorks - Create. Connect. Get Paid.",
   description:
     "The decentralized marketplace where Web3 brands meet UGC creators. Smart contracts handle everything—escrow, licensing, payments. No middlemen. No platform fees.",
 }

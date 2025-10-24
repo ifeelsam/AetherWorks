@@ -14,7 +14,7 @@ export default function Hero() {
             <h1 className="space-grotesk text-5xl md:text-7xl font-black leading-tight mb-6">
               Create. Connect.
               <br />
-              Get Paid Onchain.
+              Get Paid with AetherWorks.
             </h1>
             <p className="text-lg md:text-xl leading-relaxed max-w-md text-gray-700">
               The decentralized marketplace where Web3 brands meet UGC creators. Smart contracts handle
@@ -42,15 +42,16 @@ export default function Hero() {
             
             <div className="border-b-4 border-black py-6">
               <p className="text-sm font-medium mb-2">ACTIVE CAMPAIGNS</p>
-              <p className="space-grotesk text-6xl font-black">—</p>
+              <p className="space-grotesk text-6xl font-black">3+</p>
             </div>
             <div className="border-b-4 border-black py-6">
               <p className="text-sm font-medium mb-2">TOTAL PAYOUTS</p>
-              <p className="space-grotesk text-4xl font-black">— SOL</p>
+              <p className="space-grotesk text-4xl font-black">100+ USDC</p>
             </div>
             <div className="py-6">
               <p className="text-sm font-medium mb-2">CREATORS PAID</p>
-              <p className="space-grotesk text-4xl font-black">—</p>
+              <p className="space-grotesk text-4xl font-black">50+</p>
+
             </div>
           </div>
         </div>

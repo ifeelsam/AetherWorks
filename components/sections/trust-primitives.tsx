@@ -9,7 +9,7 @@ export default function TrustPrimitives() {
     },
     {
       icon: "📄",
-      title: "Onchain Licenses",
+      title: "AetherWorks Licenses",
       description: "Usage rights encoded as NFTs. Verifiable proof for platforms and legal compliance.",
     },
     {

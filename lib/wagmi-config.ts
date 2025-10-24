@@ -15,7 +15,7 @@ export const config = createConfig({
     injected(),
     metaMask(),
     coinbaseWallet({
-      appName: 'UGC Marketplace',
+      appName: 'AetherWorks',
     }),
   ],
 })

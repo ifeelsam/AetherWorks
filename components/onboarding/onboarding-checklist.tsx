@@ -22,8 +22,8 @@ const STEPS = [
   },
   {
     title: "Fund Wallet",
-    description: "Deposit SOL or USDC for escrow",
-    details: "Current Balance: 0 SOL",
+    description: "Deposit ETH or USDC for escrow",
+    details: "Current Balance: 0 ETH",
   },
   {
     title: "Payment Settings",

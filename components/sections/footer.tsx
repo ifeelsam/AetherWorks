@@ -7,11 +7,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
           {/* Column 1 */}
           <div>
-            <h3 className="space-grotesk text-2xl font-black mb-2">ONCHAIN</h3>
+            <h3 className="space-grotesk text-2xl font-black mb-2">AetherWorks</h3>
             <p className="text-sm text-gray-400">
-              Decentralized UGC marketplace
-              <br />
-              Built on Base
+              The decentralized marketplace where Web3 brands meet UGC creators. Smart contracts handle everything—escrow, licensing, payments. No middlemen. No platform fees.
             </p>
           </div>
 
@@ -28,36 +26,6 @@ export default function Footer() {
                 <li>
                   <a href="#" className="hover:text-white">
                     Pricing
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Documentation
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    API
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-3">Resources</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Case Studies
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Support
                   </a>
                 </li>
               </ul>
@@ -79,38 +47,13 @@ export default function Footer() {
                     Privacy
                   </a>
                 </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    License Agreement
-                  </a>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-3">Community</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Discord
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    Twitter
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-white">
-                    GitHub
-                  </a>
-                </li>
               </ul>
             </div>
           </div>
         </div>
 
         <div className="border-t-4 border-gray-800 pt-8">
-          <p className="text-sm text-gray-400 text-center">© 2025 ONCHAIN - Built with ❤️ for Web3 creators</p>
+          <p className="text-sm text-gray-400 text-center">© 2025 AetherWorks - Built with ❤️ for Web3 creators</p>
         </div>
       </div>
     </footer>

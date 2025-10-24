@@ -30,7 +30,7 @@ export default function CampaignDetailPage({ params }: { params: { id: string } 
                 <span className="space-grotesk text-2xl font-bold">DeFi Protocol</span>
                 <span className="text-sm font-bold text-green-500">✓ Verified</span>
               </div>
-              <p className="text-sm text-gray-600 jetbrains-mono">@defiprotocol.sol</p>
+              <p className="text-sm text-gray-600 jetbrains-mono">@defiprotocol.eth</p>
             </div>
           </div>
           <div className="flex gap-4">
