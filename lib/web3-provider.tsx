@@ -2,12 +2,20 @@
 
 import type React from "react"
 import { createContext, useContext, useState, useEffect } from "react"
+import { WagmiProvider } from 'wagmi'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useAccount, useConnect, useDisconnect, useBalance } from 'wagmi'
+import { config } from './wagmi-config'
+
+// Create a React-Query client
+const queryClient = new QueryClient()
 
 interface Web3ContextType {
   account: string | null
   isConnected: boolean
   balance: string
   isLoading: boolean
+  connectingWallet: boolean
   connectWallet: () => Promise<void>
   disconnectWallet: () => void
   publishCampaign: (campaignData: any) => Promise<string>
@@ -16,40 +24,36 @@ interface Web3ContextType {
 
 const Web3Context = createContext<Web3ContextType | undefined>(undefined)
 
-export function Web3Provider({ children }: { children: React.ReactNode }) {
-  const [account, setAccount] = useState<string | null>(null)
-  const [balance, setBalance] = useState("0")
+function InnerWeb3Provider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    // Check for existing wallet connection
-    const storedAccount = localStorage.getItem("walletAccount")
-    if (storedAccount) {
-      setAccount(storedAccount)
-      // Simulate balance fetch
-      setBalance("3000")
-    }
-  }, [])
+  const [connectingWallet, setConnectingWallet] = useState(false)
+  
+  const { address, isConnected } = useAccount()
+  const { connect, connectors, isPending } = useConnect()
+  const { disconnect } = useDisconnect()
+  const { data: balanceData } = useBalance({ 
+    address,
+  })
 
   const connectWallet = async () => {
-    setIsLoading(true)
+    setConnectingWallet(true)
     try {
-      // Simulate wallet connection
-      const mockAccount = `0x${Math.random().toString(16).slice(2, 42)}`
-      setAccount(mockAccount)
-      localStorage.setItem("walletAccount", mockAccount)
-      setBalance("3000")
+      // Find the injected connector (like MetaMask) or WalletConnect
+      const availableConnector = connectors.find(c => c.ready)
+      if (availableConnector) {
+        await connect({ connector: availableConnector })
+      } else {
+        throw new Error("No wallet connectors available")
+      }
     } catch (error) {
       console.error("Failed to connect wallet:", error)
     } finally {
-      setIsLoading(false)
+      setConnectingWallet(false)
     }
   }
 
   const disconnectWallet = () => {
-    setAccount(null)
-    setBalance("0")
-    localStorage.removeItem("walletAccount")
+    disconnect()
   }
 
   const publishCampaign = async (campaignData: any): Promise<string> => {
@@ -85,11 +89,6 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
       // Simulate escrow funding
       const txHash = `0x${Math.random().toString(16).slice(2, 66)}`
 
-      // Update balance
-      const newBalance = (Number.parseFloat(balance) - Number.parseFloat(amount)).toString()
-      setBalance(newBalance)
-      localStorage.setItem("walletBalance", newBalance)
-
       return txHash
     } catch (error) {
       console.error("Failed to fund escrow:", error)
@@ -102,10 +101,11 @@ export function Web3Provider({ children }: { children: React.ReactNode }) {
   return (
     <Web3Context.Provider
       value={{
-        account,
-        isConnected: !!account,
-        balance,
+        account: address || null,
+        isConnected,
+        balance: balanceData?.formatted || "0",
         isLoading,
+        connectingWallet: isPending || connectingWallet,
         connectWallet,
         disconnectWallet,
         publishCampaign,
@@ -123,4 +123,14 @@ export function useWeb3() {
     throw new Error("useWeb3 must be used within Web3Provider")
   }
   return context
+}
+
+export function Web3Provider({ children }: { children: React.ReactNode }) {
+  return (
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <InnerWeb3Provider>{children}</InnerWeb3Provider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  )
 }

@@ -1,7 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { BrutalistCard } from "@/components/ui/brutalist-card"
+import { useWeb3 } from "@/lib/web3-provider"
 
 interface AuthCardProps {
   onAuthSuccess: (walletAddress: string, email?: string) => void
@@ -9,17 +10,25 @@ interface AuthCardProps {
 
 export default function AuthCard({ onAuthSuccess }: AuthCardProps) {
   const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
+  const [showEmailInput, setShowEmailInput] = useState(false)
+  const { connectWallet, account, isConnected, connectingWallet } = useWeb3()
 
   const handleWalletConnect = async () => {
-    setIsLoading(true)
-    // Simulate wallet connection
-    const mockWalletAddress = `0x${Math.random().toString(16).slice(2, 10)}`
-    setTimeout(() => {
-      onAuthSuccess(mockWalletAddress, email)
-      setIsLoading(false)
-    }, 500)
+    await connectWallet()
   }
+
+  const handleContinue = () => {
+    if (account) {
+      onAuthSuccess(account, email)
+    }
+  }
+
+  // When wallet is connected, show the email input
+  useEffect(() => {
+    if (isConnected && account) {
+      setShowEmailInput(true)
+    }
+  }, [isConnected, account])
 
   return (
     <BrutalistCard shadow="lg">
@@ -32,41 +41,54 @@ export default function AuthCard({ onAuthSuccess }: AuthCardProps) {
           </div>
         </div>
 
-        {/* Email Input */}
-        <div className="space-y-2">
-          <label className="form-label">Email (Optional)</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="your@email.com"
-            className="brutalist-input w-full"
-          />
-        </div>
-
         {/* Auth Methods */}
-        <div className="space-y-3">
-          <button
-            onClick={handleWalletConnect}
-            disabled={isLoading}
-            className="w-full border-4 border-black bg-black text-white p-4 font-space-grotesk font-bold text-base hover:bg-gray-900 transition-all disabled:opacity-50"
-          >
-            {isLoading ? "Connecting..." : "Connect Wallet"}
-          </button>
+        {!showEmailInput ? (
+          <div className="space-y-3">
+            <button
+              onClick={handleWalletConnect}
+              disabled={connectingWallet}
+              className="w-full border-4 border-black bg-black text-white p-4 font-space-grotesk font-bold text-base hover:bg-gray-900 transition-all disabled:opacity-50"
+            >
+              {connectingWallet ? "Connecting..." : "Connect Wallet"}
+            </button>
+          </div>
+        ) : (
+          <>
+            {/* Connected Wallet */}
+            <div className="space-y-2">
+              <label className="form-label">Connected Wallet</label>
+              <div className="brutalist-input w-full p-4 bg-gray-100 flex items-center justify-between">
+                <div className="font-mono text-sm truncate">{account}</div>
+                <div className="bg-green-100 text-green-800 px-2 py-1 text-xs font-semibold rounded">Connected</div>
+              </div>
+            </div>
 
-          <button className="w-full border-4 border-black bg-white text-black p-4 font-space-grotesk font-bold text-base hover:bg-gray-50 transition-all">
-            Continue with Email
-          </button>
+            {/* Email Input */}
+            <div className="space-y-2">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="brutalist-input w-full"
+              />
+            </div>
 
-          <button className="w-full border-4 border-black bg-white text-black p-4 font-space-grotesk font-bold text-base hover:bg-gray-50 transition-all">
-            Continue with Google
-          </button>
-        </div>
+            {/* Continue Button */}
+            <button
+              onClick={handleContinue}
+              className="w-full border-4 border-black bg-black text-white p-4 font-space-grotesk font-bold text-base hover:bg-gray-900 transition-all"
+            >
+              Continue
+            </button>
+          </>
+        )}
 
         {/* Security Notice */}
         <div className="border-l-4 border-black bg-gray-50 p-4 space-y-1">
-          <p className="font-semibold text-sm">Secured by Privy</p>
-          <p className="text-xs text-gray-600">SOC 2 Type II Certified</p>
+          <p className="font-semibold text-sm">Secured by Blockchain</p>
+          <p className="text-xs text-gray-600">Connect with Base Sepolia</p>
           <p className="text-xs text-gray-600">Your keys, your custody</p>
         </div>
 

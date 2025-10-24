@@ -1,4 +1,4 @@
-const deployedcontracts = {
+export const deployedcontracts = {
   84532: {
     yourcontract: {
       address: "0x25c20ad94935c94e68b5308b5815ef1f242178fa",
