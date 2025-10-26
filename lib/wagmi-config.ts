@@ -2,7 +2,7 @@
 
 import { http, createConfig } from 'wagmi'
 import { base, baseSepolia } from 'wagmi/chains'
-import { metaMask } from 'wagmi/connectors'
+import { metaMask, safe } from 'wagmi/connectors'
 
 // Set up wagmi config with Base Sepolia as default network
 export const config = createConfig({
@@ -13,5 +13,6 @@ export const config = createConfig({
   },
   connectors: [
     metaMask(),
+    safe()
   ],
 })
