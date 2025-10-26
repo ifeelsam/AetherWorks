@@ -11,29 +11,44 @@ interface OnboardingChecklistProps {
 
 const STEPS = [
   {
+    title: "Connect Your Wallet",
+    description: "Set up your wallet for transactions",
+    details: "Connect your MetaMask or other Web3 wallet to enable secure transactions on AetherWorks. We support Base Sepolia for testing and Base mainnet for production. Make sure your wallet is properly configured for the correct network.",
+  },
+  {
     title: "Company Information",
     description: "Tell us about your brand",
-    details: "Required for compliance",
+    details: "Add your company name, website, industry, and contact information. This helps creators understand who they're working with and establishes your brand identity on AetherWorks.",
+  },
+  {
+    title: "Brand Assets",
+    description: "Upload your logo and brand guidelines",
+    details: "Help creators understand your visual identity by uploading your logo, brand colors, and style guide. This ensures all content created matches your brand's aesthetic.",
   },
   {
     title: "KYB Verification",
     description: "Verify business identity",
-    details: "1-2 business days approval",
+    details: "Complete our Know Your Business (KYB) process to verify your company's legitimacy. This helps maintain platform integrity and builds trust with creators. Approval typically takes 1-2 business days.",
   },
   {
     title: "Fund Wallet",
     description: "Deposit ETH or USDC for escrow",
-    details: "Current Balance: 0 ETH",
+    details: "Add funds to your wallet to cover campaign costs, creator payments, and transaction fees. Recommended minimum: 0.1 ETH or equivalent in USDC.",
   },
   {
     title: "Payment Settings",
-    description: "Choose default payment token",
-    details: "SOL, USDC, or USDT",
+    description: "Choose default payment options",
+    details: "Select your preferred payment tokens (ETH, USDC), set default payment terms, and configure automatic payments. This streamlines your campaign launch process.",
+  },
+  {
+    title: "License Preferences",
+    description: "Define your content licensing terms",
+    details: "Set up your preferred content licensing terms for UGC campaigns. Define usage rights, exclusivity options, and attribution requirements that will become part of your smart contracts.",
   },
   {
     title: "Platform Agreement",
     description: "Review and accept terms",
-    details: "Escrow terms & dispute resolution",
+    details: "Review AetherWorks' platform terms, escrow conditions, and dispute resolution process. This legal agreement governs all transactions on the platform.",
   },
 ]
 
