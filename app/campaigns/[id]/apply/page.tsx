@@ -29,7 +29,7 @@ export default function ApplyCampaignPage({ params }: { params: { id: string } }
           </div>
           <div className="flex gap-4 pt-4">
             <button
-              onClick={() => router.push("/dashboard/creator")}
+              onClick={() => router.push("/dashboard")}
               className="flex-1 border-4 border-black bg-black text-white p-3 font-semibold hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all"
             >
               View My Applications

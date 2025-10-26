@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { BrutalistCard } from "@/components/ui/brutalist-card"
-import { useWeb3 } from "@/lib/web3-provider"
+import { useWallet } from "@/hooks/use-wallet"
 
 interface AuthCardProps {
   onAuthSuccess: (walletAddress: string, email?: string) => void
@@ -11,24 +11,24 @@ interface AuthCardProps {
 export default function AuthCard({ onAuthSuccess }: AuthCardProps) {
   const [email, setEmail] = useState("")
   const [showEmailInput, setShowEmailInput] = useState(false)
-  const { connectWallet, account, isConnected, connectingWallet } = useWeb3()
+  const { wallet, connect, isLoading } = useWallet()
 
   const handleWalletConnect = async () => {
-    await connectWallet()
+    await connect()
   }
 
   const handleContinue = () => {
-    if (account) {
-      onAuthSuccess(account, email)
+    if (wallet.walletAdd) {
+      onAuthSuccess(wallet.walletAdd, email)
     }
   }
 
   // When wallet is connected, show the email input
   useEffect(() => {
-    if (isConnected && account) {
+    if (wallet.isConnected && wallet.walletAdd) {
       setShowEmailInput(true)
     }
-  }, [isConnected, account])
+  }, [wallet.isConnected, wallet.walletAdd])
 
   return (
     <BrutalistCard shadow="lg">
@@ -46,10 +46,10 @@ export default function AuthCard({ onAuthSuccess }: AuthCardProps) {
           <div className="space-y-3">
             <button
               onClick={handleWalletConnect}
-              disabled={connectingWallet}
+              disabled={isLoading}
               className="w-full border-4 border-black bg-black text-white p-4 font-space-grotesk font-bold text-base hover:bg-gray-900 transition-all disabled:opacity-50"
             >
-              {connectingWallet ? "Connecting..." : "Connect Wallet"}
+              {isLoading ? "Connecting..." : "Connect Wallet"}
             </button>
           </div>
         ) : (
@@ -58,7 +58,7 @@ export default function AuthCard({ onAuthSuccess }: AuthCardProps) {
             <div className="space-y-2">
               <label className="form-label">Connected Wallet</label>
               <div className="brutalist-input w-full p-4 bg-gray-100 flex items-center justify-between">
-                <div className="font-mono text-sm truncate">{account}</div>
+                <div className="font-mono text-sm truncate">{wallet.walletAdd}</div>
                 <div className="bg-green-100 text-green-800 px-2 py-1 text-xs font-semibold rounded">Connected</div>
               </div>
             </div>

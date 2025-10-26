@@ -24,7 +24,7 @@ export default function AuthPage() {
     } else if (role === "brand") {
       router.push("/onboarding/brand")
     } else {
-      router.push("/dashboard/creator")
+      router.push("/dashboard")
     }
   }
 

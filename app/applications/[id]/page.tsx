@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, RefObject } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import ApplicationHeader from "@/components/applications/application-header"
@@ -211,7 +211,7 @@ export default function ApplicationDetailPage() {
               Retry
             </button>
             <Link
-              href="/dashboard/creator"
+              href="/dashboard"
               className="flex-1 border-4 border-black p-3 font-semibold hover:bg-gray-100 transition-colors text-center"
             >
               Back to Dashboard
@@ -227,7 +227,7 @@ export default function ApplicationDetailPage() {
       {/* Top Navigation */}
       <div className="sticky top-0 z-40 bg-white border-b-4 border-black">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Link href="/dashboard/creator" className="flex items-center gap-2 font-semibold hover:text-orange-500">
+          <Link href="/dashboard" className="flex items-center gap-2 font-semibold hover:text-orange-500">
             ← Back to Dashboard
           </Link>
           <h1 className="space-grotesk text-xl font-bold">My Applications</h1>
@@ -242,11 +242,11 @@ export default function ApplicationDetailPage() {
 
       {/* Breadcrumb */}
       <div className="max-w-4xl mx-auto px-4 py-6 text-sm text-gray-600 border-b-2 border-gray-300">
-        <Link href="/dashboard/creator" className="hover:text-orange-500">
+        <Link href="/dashboard" className="hover:text-orange-500">
           Dashboard
         </Link>
         {" > "}
-        <Link href="/dashboard/creator?tab=applications" className="hover:text-orange-500">
+        <Link href="/dashboard tab=applications" className="hover:text-orange-500">
           Applications
         </Link>
         {" > "}
@@ -270,7 +270,7 @@ export default function ApplicationDetailPage() {
         {/* Message Thread */}
         <MessageThread
           messages={application.messages}
-          messagesEndRef={messagesEndRef}
+          messagesEndRef={messagesEndRef as RefObject<HTMLDivElement>}
           applicationStatus={application.status}
         />
 

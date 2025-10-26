@@ -137,7 +137,7 @@ export default function ApplicationActions({ status, onWithdraw, campaignTitle }
             Browse Similar Campaigns
           </Link>
           <Link
-            href="/dashboard/creator"
+            href="/dashboard"
             className="flex-1 border-4 border-white bg-white text-black p-3 font-semibold hover:bg-gray-100 transition-colors text-center"
           >
             Return to Dashboard
@@ -164,7 +164,7 @@ export default function ApplicationActions({ status, onWithdraw, campaignTitle }
             Browse Other Campaigns
           </Link>
           <Link
-            href="/dashboard/creator"
+            href="/dashboard"
             className="flex-1 border-4 border-black bg-white text-black p-3 font-semibold hover:bg-gray-100 transition-colors text-center"
           >
             Return to Dashboard

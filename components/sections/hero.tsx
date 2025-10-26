@@ -1,7 +1,5 @@
 "use client"
-
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 
 export default function Hero() {
   const router = useRouter()
@@ -27,9 +25,9 @@ export default function Hero() {
             <button onClick={() => router.push("/auth")} className="brutalist-btn brutalist-border brutalist-shadow bg-black/80 text-white px-8 py-4 text-base font-medium hover:bg-black">
               Launch Campaign
             </button>
-            <Link href="/auth/role-selection" className="brutalist-btn brutalist-border brutalist-shadow bg-gray-300 text-black px-8 py-4 text-base font-medium hover:bg-black hover:text-white">
+            <button onClick={()=> redirect("/auth")} className="brutalist-btn brutalist-border brutalist-shadow bg-gray-300 text-black px-8 py-4 text-base font-medium hover:bg-black hover:text-white">
               Browse Briefs
-            </Link>
+            </button>
           </div>
 
           {/* Micro-copy */}

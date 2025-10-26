@@ -2,7 +2,7 @@
 
 import { http, createConfig } from 'wagmi'
 import { base, baseSepolia } from 'wagmi/chains'
-import { injected, coinbaseWallet, metaMask } from 'wagmi/connectors'
+import { metaMask } from 'wagmi/connectors'
 
 // Set up wagmi config with Base Sepolia as default network
 export const config = createConfig({
@@ -12,10 +12,6 @@ export const config = createConfig({
     [base.id]: http(),
   },
   connectors: [
-    injected(),
     metaMask(),
-    coinbaseWallet({
-      appName: 'AetherWorks',
-    }),
   ],
 })
