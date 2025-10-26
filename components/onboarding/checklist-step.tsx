@@ -14,6 +14,10 @@ interface ChecklistStepProps {
   onComplete: () => void
 }
 
+const INDUSTRIES = ["DeFi / Finance", "NFTs / Gaming", "Infrastructure / Tools", "Consumer Apps", "Other"]
+const TEAM_SIZES = ["1-10", "11-50", "51-200", "201-1000", "1000+"]
+const COUNTRIES = ["United States", "Canada", "United Kingdom", "Germany", "France", "Other"]
+
 export default function ChecklistStep({
   stepNumber,
   title,
@@ -25,6 +29,16 @@ export default function ChecklistStep({
   onComplete,
 }: ChecklistStepProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({
+    name: "",
+    website: "",
+    industry: "",
+    teamSize: "",
+    country: "",
+    description: "",
+    logoUrl: "",
+  })
+  const [errors, setErrors] = useState<Record<string, string>>({})
 
   const borderColor = {
     pending: "border-l-gray-400",
@@ -32,13 +46,160 @@ export default function ChecklistStep({
     completed: "border-l-green-400 bg-green-50",
   }[status]
 
+  const handleInputChange = (field: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
+  }
+
+  const validateForm = () => {
+    if (stepNumber === 2) { // Company Information step
+      const newErrors: Record<string, string> = {}
+      
+      if (!formData.name.trim()) newErrors.name = "Company name is required"
+      if (!formData.website.trim()) newErrors.website = "Website URL is required"
+      if (!formData.industry) newErrors.industry = "Industry is required"
+      if (!formData.country) newErrors.country = "Country is required"
+      
+      // Validate URL
+      if (formData.website && !formData.website.startsWith("http")) {
+        newErrors.website = "Valid website URL required"
+      }
+      
+      setErrors(newErrors)
+      return Object.keys(newErrors).length === 0
+    }
+    return true
+  }
+
   const handleAction = async () => {
     setIsLoading(true)
-    // Simulate action
+    
+    // For Company Information step, validate the form
+    if (stepNumber === 2 && status === "in-progress") {
+      if (!validateForm()) {
+        setIsLoading(false)
+        return
+      }
+      
+      // Simulate form submission
+      setTimeout(() => {
+        onComplete()
+        setIsLoading(false)
+      }, 1000)
+      return
+    }
+    
+    // For other steps, just complete them
     setTimeout(() => {
       onComplete()
       setIsLoading(false)
     }, 500)
+  }
+
+  // Render company information form for step 2
+  const renderCompanyInfoForm = () => {
+    if (stepNumber !== 2 || !isExpanded) return null
+    
+    return (
+      <div className="space-y-6 mt-4">
+        {/* Company Name */}
+        <div>
+          <label className="block text-sm font-medium mb-1 required">Company Name</label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={(e) => handleInputChange("name", e.target.value)}
+            placeholder="Acme Labs"
+            className={`brutalist-input w-full ${errors.name ? "border-red-500" : ""}`}
+          />
+          {errors.name && <div className="text-red-500 text-sm mt-1">❌ {errors.name}</div>}
+        </div>
+
+        {/* Website */}
+        <div>
+          <label className="block text-sm font-medium mb-1 required">Website URL</label>
+          <input
+            type="url"
+            value={formData.website}
+            onChange={(e) => handleInputChange("website", e.target.value)}
+            placeholder="https://acme.com"
+            className={`brutalist-input w-full ${errors.website ? "border-red-500" : ""}`}
+          />
+          {errors.website && <div className="text-red-500 text-sm mt-1">❌ {errors.website}</div>}
+        </div>
+
+        {/* Industry */}
+        <div>
+          <label className="block text-sm font-medium mb-1 required">Industry</label>
+          <select
+            value={formData.industry}
+            onChange={(e) => handleInputChange("industry", e.target.value)}
+            className={`brutalist-input w-full ${errors.industry ? "border-red-500" : ""}`}
+          >
+            <option value="">Select an industry</option>
+            {INDUSTRIES.map((ind) => (
+              <option key={ind} value={ind}>
+                {ind}
+              </option>
+            ))}
+          </select>
+          {errors.industry && <div className="text-red-500 text-sm mt-1">❌ {errors.industry}</div>}
+        </div>
+
+        {/* Team Size */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Team Size</label>
+          <select
+            value={formData.teamSize}
+            onChange={(e) => handleInputChange("teamSize", e.target.value)}
+            className="brutalist-input w-full"
+          >
+            <option value="">Select team size</option>
+            {TEAM_SIZES.map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Country */}
+        <div>
+          <label className="block text-sm font-medium mb-1 required">Country of Registration</label>
+          <select
+            value={formData.country}
+            onChange={(e) => handleInputChange("country", e.target.value)}
+            className={`brutalist-input w-full ${errors.country ? "border-red-500" : ""}`}
+          >
+            <option value="">Select a country</option>
+            {COUNTRIES.map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
+          {errors.country && <div className="text-red-500 text-sm mt-1">❌ {errors.country}</div>}
+        </div>
+
+        {/* Description */}
+        <div>
+          <label className="block text-sm font-medium mb-1">About Your Brand</label>
+          <textarea
+            value={formData.description}
+            onChange={(e) => handleInputChange("description", e.target.value)}
+            placeholder="What does your company do? This helps creators understand your brand..."
+            className="brutalist-input w-full h-32 resize-none"
+          />
+          <div className="text-right text-xs text-gray-600 mt-2">{formData.description.length}/500</div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -60,6 +221,9 @@ export default function ChecklistStep({
             <div className="mt-6 space-y-4 border-t-4 border-black pt-6">
               <p className="text-gray-600">{details}</p>
 
+              {/* Render company info form for step 2 */}
+              {renderCompanyInfoForm()}
+
               {status === "completed" && (
                 <div className="flex items-center gap-2 text-green-600 font-semibold">
                   <span>✓</span>
@@ -68,13 +232,19 @@ export default function ChecklistStep({
               )}
 
               {status === "pending" && (
-                <BrutalistButton onClick={handleAction} disabled={isLoading} size="md">
+                <BrutalistButton onClick={(e) => {
+                  e.stopPropagation();
+                  handleAction();
+                }} disabled={isLoading} size="md">
                   {isLoading ? "Loading..." : "Start"}
                 </BrutalistButton>
               )}
 
               {status === "in-progress" && (
-                <BrutalistButton onClick={handleAction} disabled={isLoading} size="md">
+                <BrutalistButton onClick={(e) => {
+                  e.stopPropagation();
+                  handleAction();
+                }} disabled={isLoading} size="md">
                   {isLoading ? "Saving..." : "Complete Step"}
                 </BrutalistButton>
               )}

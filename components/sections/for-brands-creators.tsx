@@ -15,7 +15,7 @@ export default function ForBrandsCreators() {
             <li>• Dispute resolution built-in</li>
             <li>• Analytics dashboard for ROI tracking</li>
           </ul>
-          <button className="brutalist-btn brutalist-border brutalist-shadow bg-white text-black px-8 py-4 text-base font-medium">
+          <button className="secondary-btn brutalist-border secondary-shadow bg-white text-black px-8 py-4 text-base font-medium">
             Create First Campaign →
           </button>
         </div>
@@ -32,7 +32,7 @@ export default function ForBrandsCreators() {
             <li>• Zero subscription fees</li>
           </ul>
           <button className="brutalist-btn brutalist-border brutalist-shadow bg-black text-white px-8 py-4 text-base font-medium">
-            Find Your First Brief →
+            Find Your First Brief
           </button>
         </div>
       </div>
