@@ -17,6 +17,10 @@ interface ChecklistStepProps {
 const INDUSTRIES = ["DeFi / Finance", "NFTs / Gaming", "Infrastructure / Tools", "Consumer Apps", "Other"]
 const TEAM_SIZES = ["1-10", "11-50", "51-200", "201-1000", "1000+"]
 const COUNTRIES = ["United States", "Canada", "United Kingdom", "Germany", "France", "Other"]
+const PAYMENT_TOKENS = ["ETH", "USDC", "DAI", "USDT"]
+const PAYMENT_TERMS = ["On Completion", "Milestone-Based", "Upfront + Completion", "Weekly", "Monthly"]
+const LICENSE_TYPES = ["Exclusive", "Non-Exclusive", "Time-Limited Exclusive"]
+const LICENSE_DURATIONS = ["30 Days", "90 Days", "180 Days", "1 Year", "2 Years", "Perpetual"]
 
 export default function ChecklistStep({
   stepNumber,
@@ -30,6 +34,7 @@ export default function ChecklistStep({
 }: ChecklistStepProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
+    // Company Information
     name: "",
     website: "",
     industry: "",
@@ -37,9 +42,28 @@ export default function ChecklistStep({
     country: "",
     description: "",
     logoUrl: "",
+    // Brand Assets
     brandAssets: null as File | null,
     brandAssetName: "",
     brandGuidelines: "",
+    // Payment Settings
+    preferredToken: "",
+    defaultPaymentTerms: "",
+    autoPayEnabled: false,
+    minPayment: "",
+    maxBudget: "",
+    // License Preferences
+    licenseType: "",
+    licenseDuration: "",
+    attributionRequired: false,
+    commercialUse: false,
+    editRights: false,
+    licenseNotes: "",
+    // Platform Agreement
+    termsAccepted: false,
+    disputeResolutionAccepted: false,
+    escrowTermsAccepted: false,
+    privacyPolicyAccepted: false,
   })
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -52,6 +76,17 @@ export default function ChecklistStep({
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+    if (errors[field]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[field]
+        return newErrors
+      })
+    }
+  }
+  
+  const handleToggle = (field: string) => {
+    setFormData((prev) => ({ ...prev, [field]: !prev[field as keyof typeof prev] }))
     if (errors[field]) {
       setErrors((prev) => {
         const newErrors = { ...prev }
@@ -119,14 +154,63 @@ export default function ChecklistStep({
       setErrors(newErrors)
       return Object.keys(newErrors).length === 0
     }
+    else if (stepNumber === 4) { // KYB Verification (Optional) step
+      // This step is optional, so no validation required
+      return true
+    }
+    else if (stepNumber === 5) { // Payment Settings step
+      const newErrors: Record<string, string> = {}
+      
+      if (!formData.preferredToken) newErrors.preferredToken = "Please select a token"
+      if (!formData.defaultPaymentTerms) newErrors.defaultPaymentTerms = "Please select payment terms"
+      
+      // Validate minimum payment is a number
+      if (formData.minPayment && isNaN(parseFloat(formData.minPayment))) {
+        newErrors.minPayment = "Please enter a valid amount"
+      }
+      
+      // Validate maximum budget is a number
+      if (formData.maxBudget && isNaN(parseFloat(formData.maxBudget))) {
+        newErrors.maxBudget = "Please enter a valid amount"
+      }
+      
+      setErrors(newErrors)
+      return Object.keys(newErrors).length === 0
+    }
+    else if (stepNumber === 6) { // License Preferences step
+      const newErrors: Record<string, string> = {}
+      
+      if (!formData.licenseType) newErrors.licenseType = "Please select a license type"
+      if (!formData.licenseDuration) newErrors.licenseDuration = "Please select a duration"
+      
+      setErrors(newErrors)
+      return Object.keys(newErrors).length === 0
+    }
+    else if (stepNumber === 7) { // Platform Agreement step
+      const newErrors: Record<string, string> = {}
+      
+      if (!formData.termsAccepted) newErrors.termsAccepted = "You must accept the terms of service"
+      if (!formData.disputeResolutionAccepted) newErrors.disputeResolutionAccepted = "You must accept the dispute resolution policy"
+      if (!formData.escrowTermsAccepted) newErrors.escrowTermsAccepted = "You must accept the escrow terms"
+      if (!formData.privacyPolicyAccepted) newErrors.privacyPolicyAccepted = "You must accept the privacy policy"
+      
+      setErrors(newErrors)
+      return Object.keys(newErrors).length === 0
+    }
     return true
   }
 
   const handleAction = async () => {
     setIsLoading(true)
     
-    // For Company Information step, validate the form
-    if (stepNumber === 2 && status === "in-progress") {
+    // For steps that require validation
+    if (status === "in-progress" && 
+        (stepNumber === 2 || // Company Information
+         stepNumber === 3 || // Brand Assets 
+         stepNumber === 5 || // Payment Settings
+         stepNumber === 6 || // License Preferences
+         stepNumber === 7    // Platform Agreement
+        )) {
       if (!validateForm()) {
         setIsLoading(false)
         return
@@ -140,22 +224,7 @@ export default function ChecklistStep({
       return
     }
     
-    // For Brand Assets step, validate the form
-    if (stepNumber === 3 && status === "in-progress") {
-      if (!validateForm()) {
-        setIsLoading(false)
-        return
-      }
-      
-      // Simulate form submission
-      setTimeout(() => {
-        onComplete()
-        setIsLoading(false)
-      }, 1000)
-      return
-    }
-    
-    // For other steps, just complete them
+    // For optional steps or steps without forms, just complete them
     setTimeout(() => {
       onComplete()
       setIsLoading(false)
@@ -315,6 +384,321 @@ export default function ChecklistStep({
       </div>
     )
   }
+  
+  // Render payment settings form for step 5
+  const renderPaymentSettingsForm = () => {
+    if (stepNumber !== 5 || !isExpanded) return null
+    
+    return (
+      <div className="space-y-6 mt-4">
+        {/* Preferred Token */}
+        <div>
+          <label className="block text-sm font-medium mb-1 required">Preferred Payment Token</label>
+          <select
+            value={formData.preferredToken}
+            onChange={(e) => handleInputChange("preferredToken", e.target.value)}
+            className={`brutalist-input w-full ${errors.preferredToken ? "border-red-500" : ""}`}
+          >
+            <option value="">Select a token</option>
+            {PAYMENT_TOKENS.map((token) => (
+              <option key={token} value={token}>
+                {token}
+              </option>
+            ))}
+          </select>
+          {errors.preferredToken && <div className="text-red-500 text-sm mt-1">❌ {errors.preferredToken}</div>}
+          <p className="text-xs text-gray-500 mt-1">This will be the default payment method for all campaigns</p>
+        </div>
+
+        {/* Default Payment Terms */}
+        <div>
+          <label className="block text-sm font-medium mb-1 required">Default Payment Terms</label>
+          <select
+            value={formData.defaultPaymentTerms}
+            onChange={(e) => handleInputChange("defaultPaymentTerms", e.target.value)}
+            className={`brutalist-input w-full ${errors.defaultPaymentTerms ? "border-red-500" : ""}`}
+          >
+            <option value="">Select payment terms</option>
+            {PAYMENT_TERMS.map((terms) => (
+              <option key={terms} value={terms}>
+                {terms}
+              </option>
+            ))}
+          </select>
+          {errors.defaultPaymentTerms && <div className="text-red-500 text-sm mt-1">❌ {errors.defaultPaymentTerms}</div>}
+        </div>
+
+        {/* Min/Max Amounts */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Minimum Payment</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span className="text-gray-500">$</span>
+              </div>
+              <input
+                type="text"
+                value={formData.minPayment}
+                onChange={(e) => handleInputChange("minPayment", e.target.value)}
+                placeholder="100"
+                className={`brutalist-input w-full pl-8 ${errors.minPayment ? "border-red-500" : ""}`}
+              />
+            </div>
+            {errors.minPayment && <div className="text-red-500 text-sm mt-1">❌ {errors.minPayment}</div>}
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Maximum Budget</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <span className="text-gray-500">$</span>
+              </div>
+              <input
+                type="text"
+                value={formData.maxBudget}
+                onChange={(e) => handleInputChange("maxBudget", e.target.value)}
+                placeholder="5000"
+                className={`brutalist-input w-full pl-8 ${errors.maxBudget ? "border-red-500" : ""}`}
+              />
+            </div>
+            {errors.maxBudget && <div className="text-red-500 text-sm mt-1">❌ {errors.maxBudget}</div>}
+          </div>
+        </div>
+
+        {/* Auto-Pay Toggle */}
+        <div className="mt-2">
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={formData.autoPayEnabled}
+              onChange={() => handleToggle("autoPayEnabled")}
+              className="h-5 w-5 brutalist-checkbox"
+            />
+            <span className="text-sm font-medium">Enable automatic payments for completed tasks</span>
+          </label>
+          <p className="text-xs text-gray-500 mt-1 ml-7">
+            When enabled, payments will automatically be released from escrow when creators complete tasks
+          </p>
+        </div>
+      </div>
+    )
+  }
+  
+  // Render license preferences form for step 6
+  const renderLicensePreferencesForm = () => {
+    if (stepNumber !== 6 || !isExpanded) return null
+    
+    return (
+      <div className="space-y-6 mt-4">
+        {/* License Type */}
+        <div>
+          <label className="block text-sm font-medium mb-1 required">Default License Type</label>
+          <select
+            value={formData.licenseType}
+            onChange={(e) => handleInputChange("licenseType", e.target.value)}
+            className={`brutalist-input w-full ${errors.licenseType ? "border-red-500" : ""}`}
+          >
+            <option value="">Select a license type</option>
+            {LICENSE_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+          {errors.licenseType && <div className="text-red-500 text-sm mt-1">❌ {errors.licenseType}</div>}
+          <p className="text-xs text-gray-500 mt-1">
+            This determines how creators can use and distribute the content they create for your campaigns
+          </p>
+        </div>
+
+        {/* License Duration */}
+        <div>
+          <label className="block text-sm font-medium mb-1 required">Default License Duration</label>
+          <select
+            value={formData.licenseDuration}
+            onChange={(e) => handleInputChange("licenseDuration", e.target.value)}
+            className={`brutalist-input w-full ${errors.licenseDuration ? "border-red-500" : ""}`}
+          >
+            <option value="">Select a duration</option>
+            {LICENSE_DURATIONS.map((duration) => (
+              <option key={duration} value={duration}>
+                {duration}
+              </option>
+            ))}
+          </select>
+          {errors.licenseDuration && <div className="text-red-500 text-sm mt-1">❌ {errors.licenseDuration}</div>}
+        </div>
+
+        {/* Rights Options */}
+        <div className="space-y-3 border-4 border-black p-4">
+          <h4 className="font-bold">Default Content Rights</h4>
+          
+          {/* Attribution */}
+          <div>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.attributionRequired}
+                onChange={() => handleToggle("attributionRequired")}
+                className="h-5 w-5 brutalist-checkbox"
+              />
+              <span className="text-sm font-medium">Attribution Required</span>
+            </label>
+            <p className="text-xs text-gray-500 mt-1 ml-7">
+              Creators must be credited when their content is used
+            </p>
+          </div>
+          
+          {/* Commercial Use */}
+          <div>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.commercialUse}
+                onChange={() => handleToggle("commercialUse")}
+                className="h-5 w-5 brutalist-checkbox"
+              />
+              <span className="text-sm font-medium">Commercial Use Allowed</span>
+            </label>
+            <p className="text-xs text-gray-500 mt-1 ml-7">
+              Content can be used for commercial purposes
+            </p>
+          </div>
+          
+          {/* Edit Rights */}
+          <div>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.editRights}
+                onChange={() => handleToggle("editRights")}
+                className="h-5 w-5 brutalist-checkbox"
+              />
+              <span className="text-sm font-medium">Modification Rights</span>
+            </label>
+            <p className="text-xs text-gray-500 mt-1 ml-7">
+              You can modify or adapt content after delivery
+            </p>
+          </div>
+        </div>
+
+        {/* Additional License Notes */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Additional License Notes</label>
+          <textarea
+            value={formData.licenseNotes}
+            onChange={(e) => handleInputChange("licenseNotes", e.target.value)}
+            placeholder="Any additional licensing terms or clarifications for creators..."
+            className="brutalist-input w-full h-24 resize-none"
+          />
+          <div className="text-right text-xs text-gray-600 mt-2">{formData.licenseNotes.length}/500</div>
+        </div>
+      </div>
+    )
+  }
+  
+  // Render platform agreement form for step 7
+  const renderPlatformAgreementForm = () => {
+    if (stepNumber !== 7 || !isExpanded) return null
+    
+    return (
+      <div className="space-y-6 mt-4">
+        <div className="border-4 border-black p-6 space-y-4">
+          <h4 className="text-lg font-bold">Review and Accept Terms</h4>
+          <p className="text-sm text-gray-600">
+            Please review and accept the following legal agreements to complete your onboarding and use the platform.
+          </p>
+          
+          {/* Terms of Service */}
+          <div className="mt-4">
+            <div className="border-2 border-black p-4 h-32 overflow-y-auto mb-2 bg-gray-50">
+              <h5 className="font-semibold mb-2">Terms of Service</h5>
+              <p className="text-sm text-gray-600">
+                By using AetherWorks, you agree to our terms of service which outline your rights and responsibilities as a platform user. 
+                These terms govern all interactions, transactions, and activities on the platform. The complete terms of service document 
+                can be found <a href="#" className="text-blue-600 underline">here</a>.
+              </p>
+            </div>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.termsAccepted}
+                onChange={() => handleToggle("termsAccepted")}
+                className="h-5 w-5 brutalist-checkbox"
+              />
+              <span className="text-sm font-medium">I accept the Terms of Service</span>
+            </label>
+            {errors.termsAccepted && <div className="text-red-500 text-sm mt-1">❌ {errors.termsAccepted}</div>}
+          </div>
+          
+          {/* Dispute Resolution */}
+          <div className="mt-4">
+            <div className="border-2 border-black p-4 h-32 overflow-y-auto mb-2 bg-gray-50">
+              <h5 className="font-semibold mb-2">Dispute Resolution Policy</h5>
+              <p className="text-sm text-gray-600">
+                This policy outlines how disputes between brands and creators are resolved on AetherWorks. It includes the 
+                process for filing a dispute, timeframes for resolution, and our arbitration procedures. The complete 
+                dispute resolution policy can be found <a href="#" className="text-blue-600 underline">here</a>.
+              </p>
+            </div>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.disputeResolutionAccepted}
+                onChange={() => handleToggle("disputeResolutionAccepted")}
+                className="h-5 w-5 brutalist-checkbox"
+              />
+              <span className="text-sm font-medium">I accept the Dispute Resolution Policy</span>
+            </label>
+            {errors.disputeResolutionAccepted && <div className="text-red-500 text-sm mt-1">❌ {errors.disputeResolutionAccepted}</div>}
+          </div>
+          
+          {/* Escrow Terms */}
+          <div className="mt-4">
+            <div className="border-2 border-black p-4 h-32 overflow-y-auto mb-2 bg-gray-50">
+              <h5 className="font-semibold mb-2">Escrow Terms</h5>
+              <p className="text-sm text-gray-600">
+                Our escrow system securely holds funds until work is completed to your satisfaction. This agreement outlines how 
+                the escrow system works, including fund release conditions, timeframes, and fees. The complete escrow terms can be 
+                found <a href="#" className="text-blue-600 underline">here</a>.
+              </p>
+            </div>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.escrowTermsAccepted}
+                onChange={() => handleToggle("escrowTermsAccepted")}
+                className="h-5 w-5 brutalist-checkbox"
+              />
+              <span className="text-sm font-medium">I accept the Escrow Terms</span>
+            </label>
+            {errors.escrowTermsAccepted && <div className="text-red-500 text-sm mt-1">❌ {errors.escrowTermsAccepted}</div>}
+          </div>
+          
+          {/* Privacy Policy */}
+          <div className="mt-4">
+            <div className="border-2 border-black p-4 h-32 overflow-y-auto mb-2 bg-gray-50">
+              <h5 className="font-semibold mb-2">Privacy Policy</h5>
+              <p className="text-sm text-gray-600">
+                Our privacy policy explains how we collect, use, and protect your personal and business information. It includes 
+                details on data security, sharing practices, and your privacy rights. The complete privacy policy can be found 
+                <a href="#" className="text-blue-600 underline"> here</a>.
+              </p>
+            </div>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.privacyPolicyAccepted}
+                onChange={() => handleToggle("privacyPolicyAccepted")}
+                className="h-5 w-5 brutalist-checkbox"
+              />
+              <span className="text-sm font-medium">I accept the Privacy Policy</span>
+            </label>
+            {errors.privacyPolicyAccepted && <div className="text-red-500 text-sm mt-1">❌ {errors.privacyPolicyAccepted}</div>}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -340,6 +724,15 @@ export default function ChecklistStep({
               
               {/* Render brand assets form for step 3 */}
               {renderBrandAssetsForm()}
+              
+              {/* Render payment settings form for step 5 */}
+              {renderPaymentSettingsForm()}
+              
+              {/* Render license preferences form for step 6 */}
+              {renderLicensePreferencesForm()}
+              
+              {/* Render platform agreement form for step 7 */}
+              {renderPlatformAgreementForm()}
 
               {status === "completed" && (
                 <div className="flex items-center gap-2 text-green-600 font-semibold">

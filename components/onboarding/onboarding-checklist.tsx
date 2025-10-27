@@ -26,14 +26,9 @@ const STEPS = [
     details: "Help creators understand your visual identity by uploading your logo, brand colors, and style guide. This ensures all content created matches your brand's aesthetic.",
   },
   {
-    title: "KYB Verification",
+    title: "KYB Verification (Optional)",
     description: "Verify business identity",
-    details: "Complete our Know Your Business (KYB) process to verify your company's legitimacy. This helps maintain platform integrity and builds trust with creators. Approval typically takes 1-2 business days.",
-  },
-  {
-    title: "Fund Wallet",
-    description: "Deposit ETH or USDC for escrow",
-    details: "Add funds to your wallet to cover campaign costs, creator payments, and transaction fees. Recommended minimum: 0.1 ETH or equivalent in USDC.",
+    details: "Optional: Complete our Know Your Business (KYB) process to verify your company's legitimacy and earn a verified badge. This helps build trust with creators, but you can skip this step and complete it later. Approval typically takes 1-2 business days.",
   },
   {
     title: "Payment Settings",
