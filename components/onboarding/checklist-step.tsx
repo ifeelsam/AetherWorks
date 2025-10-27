@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { BrutalistButton } from "@/components/ui/brutalist-button"
 
 interface ChecklistStepProps {
@@ -37,7 +37,11 @@ export default function ChecklistStep({
     country: "",
     description: "",
     logoUrl: "",
+    brandAssets: null as File | null,
+    brandAssetName: "",
+    brandGuidelines: "",
   })
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const borderColor = {
@@ -54,6 +58,38 @@ export default function ChecklistStep({
         delete newErrors[field]
         return newErrors
       })
+    }
+  }
+  
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] || null
+    if (file) {
+      // Check if file is a .zip
+      if (!file.name.toLowerCase().endsWith('.zip')) {
+        setErrors((prev) => ({ ...prev, brandAssets: "Please upload a ZIP file" }))
+        return
+      }
+      
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setErrors((prev) => ({ ...prev, brandAssets: "File size exceeds 10MB limit" }))
+        return
+      }
+      
+      setFormData((prev) => ({
+        ...prev,
+        brandAssets: file,
+        brandAssetName: file.name
+      }))
+      
+      // Clear error if it exists
+      if (errors.brandAssets) {
+        setErrors((prev) => {
+          const newErrors = { ...prev }
+          delete newErrors.brandAssets
+          return newErrors
+        })
+      }
     }
   }
 
@@ -74,6 +110,15 @@ export default function ChecklistStep({
       setErrors(newErrors)
       return Object.keys(newErrors).length === 0
     }
+    else if (stepNumber === 3) { // Brand Assets step
+      const newErrors: Record<string, string> = {}
+      
+      if (!formData.brandAssets) newErrors.brandAssets = "Brand assets ZIP file is required"
+      if (!formData.brandGuidelines.trim()) newErrors.brandGuidelines = "Brand guidelines are required"
+      
+      setErrors(newErrors)
+      return Object.keys(newErrors).length === 0
+    }
     return true
   }
 
@@ -82,6 +127,21 @@ export default function ChecklistStep({
     
     // For Company Information step, validate the form
     if (stepNumber === 2 && status === "in-progress") {
+      if (!validateForm()) {
+        setIsLoading(false)
+        return
+      }
+      
+      // Simulate form submission
+      setTimeout(() => {
+        onComplete()
+        setIsLoading(false)
+      }, 1000)
+      return
+    }
+    
+    // For Brand Assets step, validate the form
+    if (stepNumber === 3 && status === "in-progress") {
       if (!validateForm()) {
         setIsLoading(false)
         return
@@ -201,6 +261,60 @@ export default function ChecklistStep({
       </div>
     )
   }
+  
+  // Render brand assets form for step 3
+  const renderBrandAssetsForm = () => {
+    if (stepNumber !== 3 || !isExpanded) return null
+    
+    return (
+      <div className="space-y-6 mt-4">
+        {/* Brand Assets Zip Upload */}
+        <div>
+          <label className="block text-sm font-medium mb-1 required">Brand Assets (.zip)</label>
+          <div className={`border-4 border-black p-4 text-center cursor-pointer transition-all ${errors.brandAssets ? "border-red-500" : ""}`}
+               onClick={() => fileInputRef.current?.click()}>
+            <input 
+              type="file" 
+              ref={fileInputRef}
+              accept=".zip"
+              onChange={handleFileChange}
+              className="hidden" 
+            />
+            {formData.brandAssets ? (
+              <div className="flex items-center justify-center space-x-2">
+                <svg className="h-6 w-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>{formData.brandAssetName}</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-4">
+                <svg className="h-8 w-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                </svg>
+                <p className="text-sm">Drop your brand assets .zip file here or <span className="underline">browse</span></p>
+                <p className="text-xs text-gray-500 mt-1">Max file size: 10MB</p>
+              </div>
+            )}
+          </div>
+          {errors.brandAssets && <div className="text-red-500 text-sm mt-1">❌ {errors.brandAssets}</div>}
+        </div>
+
+        {/* Brand Guidelines */}
+        <div>
+          <label className="block text-sm font-medium mb-1 required">Brand Guidelines</label>
+          <textarea
+            value={formData.brandGuidelines}
+            onChange={(e) => handleInputChange("brandGuidelines", e.target.value)}
+            placeholder="Provide brief guidelines for creators on how to use your brand assets, colors, and voice..."
+            className={`brutalist-input w-full h-32 resize-none ${errors.brandGuidelines ? "border-red-500" : ""}`}
+          />
+          <div className="text-right text-xs text-gray-600 mt-2">{formData.brandGuidelines.length}/1000</div>
+          {errors.brandGuidelines && <div className="text-red-500 text-sm mt-1">❌ {errors.brandGuidelines}</div>}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -223,6 +337,9 @@ export default function ChecklistStep({
 
               {/* Render company info form for step 2 */}
               {renderCompanyInfoForm()}
+              
+              {/* Render brand assets form for step 3 */}
+              {renderBrandAssetsForm()}
 
               {status === "completed" && (
                 <div className="flex items-center gap-2 text-green-600 font-semibold">
